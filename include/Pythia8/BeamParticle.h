@@ -459,6 +459,7 @@ public:
 
   // Prepare data on how much x has been used, for speedup of PDF evaluation.
   xfModPrepData xfModPrep( int iSkip, double Q2);
+  xfModPrepData xfModPrepPb(int iSkip, double Q2);
 
 private:
 
@@ -519,6 +520,7 @@ private:
 
   // The list of resolved partons.
   vector<ResolvedParton> resolved;
+  array<vector<ResolvedParton>,3> resolvedPerNucleon;
 
   // Status after all initiators have been accounted for. Junction content.
   int    nInit;

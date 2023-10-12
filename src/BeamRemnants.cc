@@ -515,6 +515,8 @@ bool BeamRemnants::setKinematics( Event& event) {
 
   // Primordial kT and compensation power among remnants.
   double kTwidthNow = (doPrimordialKT) ? primordialKTremnant : 0.;
+  std::cout << "kTwidthNow = " << kTwidthNow << std::endl;
+  exit(0);
   for (int iRem = nSys; iRem < nMaxBeam; ++iRem) {
     sHatSys[iRem] = 0.;
     kTwidth[iRem] = kTwidthNow ;

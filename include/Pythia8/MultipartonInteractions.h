@@ -301,6 +301,8 @@ private:
          fracABChighSave, cDivSave, cMaxSave;
     vector<array<double, 101> >  sudExpPTSave;
 
+    array<vector<int>,3> PartonsList;
+
     void init(int nStepIn);
   };
 

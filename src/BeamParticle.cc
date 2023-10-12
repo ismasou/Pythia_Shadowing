@@ -311,18 +311,77 @@ double BeamParticle::xMax(int iSkip) {
 //--------------------------------------------------------------------------
 
 // Caclulate used and left x fractions in total and of a few kinds.
-
-xfModPrepData BeamParticle::xfModPrep(int iSkip, double Q2) {
+xfModPrepData BeamParticle::xfModPrepPb(int iSkip, double Q2) {
 
   // Initial value.
   xfModPrepData xfData = {0., 0., 0., 0., 0.};
+ 
+
+  int jMin = 0;
+  int jMax = size();
+
+  if(jMax > 2 && jMax <= 4){
+    jMin = 2;
+  } else if (jMax > 4){
+    jMin = 4;
+  }
+
+  // std::cerr << "\e[31m # Calling xfModPrep \e[0m size " << size() << " jMin " << jMin << " jMax " << jMax << std::endl ;
 
   // Calculate total and remaining amount of x carried by valence quarks.
   for (int i = 0; i < nValKinds; ++i) {
     nValLeft[i] = nVal[i];
-    for (int j = 0; j < size(); ++j)
+    for (int j = jMin; j < jMax; ++j){
     if (j != iSkip && resolved[j].isValence()
       && resolved[j].id() == idVal[i]) --nValLeft[i];
+    }
+    double xValNow   = xValFrac(i, Q2);
+    xfData.xValTot  += nVal[i] * xValNow;
+    xfData.xValLeft += nValLeft[i] * xValNow;
+
+  }
+
+  // Calculate how much x is left overall.
+  double xUsed = 0.;
+  for (int i = jMin; i < jMax; ++i){
+    if (i != iSkip){
+      xUsed += resolved[i].x();
+      // std::cerr << i << " " << resolved[i].id() << " " << resolved[i].x() << " " << resolved[i].pT() << std::endl;
+    }
+  }
+  xfData.xLeft = 1. - xUsed;
+
+  // Calculate total amount of x carried by unmatched companion quarks.
+  for (int i = jMin; i < jMax; ++i) {
+    if (i != iSkip && resolved[i].isUnmatched()) xfData.xCompAdded
+      += xCompFrac( resolved[i].x() / (xfData.xLeft + resolved[i].x()) )
+      // Typo warning: extrafactor missing in Skands&Sjostrand article;
+      // <x> for companion refers to fraction of x left INCLUDING sea quark.
+      * (1. + resolved[i].x() / xfData.xLeft);
+  }
+
+  // Calculate total rescaling factor and pdf for sea and gluon.
+  xfData.rescaleGS = max( 0., (1. - xfData.xValLeft - xfData.xCompAdded)
+    / (1. - xfData.xValTot) );
+
+  // Done.
+  return xfData;
+}
+//--------------------------------------------------------------------------
+
+// Caclulate used and left x fractions in total and of a few kinds.
+xfModPrepData BeamParticle::xfModPrep(int iSkip, double Q2) {
+
+  // Initial value.
+  xfModPrepData xfData = {0., 0., 0., 0., 0.};
+  
+  // Calculate total and remaining amount of x carried by valence quarks.
+  for (int i = 0; i < nValKinds; ++i) {
+    nValLeft[i] = nVal[i];
+    for (int j = 0; j < size(); ++j){
+    if (j != iSkip && resolved[j].isValence()
+      && resolved[j].id() == idVal[i]) --nValLeft[i];
+    }
     double xValNow   = xValFrac(i, Q2);
     xfData.xValTot  += nVal[i] * xValNow;
     xfData.xValLeft += nValLeft[i] * xValNow;

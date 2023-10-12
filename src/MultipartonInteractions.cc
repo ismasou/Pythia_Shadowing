@@ -1947,11 +1947,13 @@ double MultipartonInteractions::sigmaPT2scatter(bool isFirst,
   // For subsequent interactions use rescaled densities.
   } else {
     xfModPrepData xfDataA = beamAPtr->xfModPrep(-1, pT2Fac);
-    xfModPrepData xfDataB = beamBPtr->xfModPrep(-1, pT2Fac);
+    xfModPrepData xfDataB = beamBPtr->xfModPrepPb(-1, pT2Fac);
     for (int id = -nQuarkIn; id <= nQuarkIn; ++id) {
       if (id == 0) continue;
       xPDF1[id+10] = beamAPtr->xfMPI(id, x1, pT2Fac, xfDataA);
       xPDF2[id+10] = beamBPtr->xfMPI(id, x2, pT2Fac, xfDataB);
+      // xPDF2[id+10] = beamBPtr->xf(id, x2, pT2Fac);
+      // throw std::runtime_error("I did it MF!!!!!!!!!!!!!");
       xPDF1sum += xPDF1[id+10];
       xPDF2sum += xPDF2[id+10];
     }
